@@ -1,5 +1,17 @@
 import django_filters 
+from django import forms
 from django.db.models import Count, Q, Window, functions, F
+
+class MovieFilter(django_filters.FilterSet):
+    ordering = django_filters.OrderingFilter(
+        fields=(('data__Year', 'Production year'),))
+    
+    genre = django_filters.CharFilter(field_name='data__Genre', 
+        label='Genre', lookup_expr='icontains')
+
+    actors = django_filters.CharFilter(field_name='data__Actors', 
+        label='Actors', lookup_expr='icontains')
+    
 class TopMovieFilter(django_filters.FilterSet):
     date_range = django_filters.DateFromToRangeFilter(
         field_name='comments__date_created', method='anno_dates')
@@ -24,3 +36,4 @@ class TopMovieFilter(django_filters.FilterSet):
                 ).annotate(rank=dense_rank).order_by('-total_comments', 'id')
                 
         return queryset
+
