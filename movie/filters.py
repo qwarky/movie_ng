@@ -15,6 +15,17 @@ class MovieFilter(django_filters.FilterSet):
 class TopMovieFilter(django_filters.FilterSet):
     date_range = django_filters.DateFromToRangeFilter(
         field_name='comments__date_created', method='anno_dates')
+        
+    def filter_queryset(self, queryset):        
+        
+        if self.form.cleaned_data['date_range'] is None:            
+            dense_rank = Window(
+                expression=functions.DenseRank(),                
+                order_by=F('total_comments').desc())        
+            queryset = queryset.annotate(total_comments=Count('comments')
+                ).annotate(rank=dense_rank).order_by('-total_comments', 'id')
+                
+        return super().filter_queryset(queryset)       
     
     def anno_dates(self, queryset, name, value):    
         if value:

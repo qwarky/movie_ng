@@ -1,7 +1,6 @@
 import requests
 
 from django.conf import settings
-from django.db.models import Count, Q, F, Window, functions
 from rest_framework.decorators import api_view
 from rest_framework import generics
 from rest_framework import status
@@ -72,15 +71,3 @@ class MovieTopList(generics.ListAPIView):
     serializer_class = serializers.TopSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = filters.TopMovieFilter
-
-    def get_queryset(self):
-        qs = super().get_queryset()       
-        
-        if self.request.query_params == {}:        
-            dense_rank = Window(
-                expression=functions.DenseRank(),                
-                order_by=F('total_comments').desc())        
-            qs = qs.annotate(total_comments=Count('comments')
-                ).annotate(rank=dense_rank).order_by('-total_comments', 'id')
-                
-        return qs
