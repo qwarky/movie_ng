@@ -24,7 +24,6 @@ class MovieListCreate(generics.ListCreateAPIView):
     queryset = models.Movie.objects.all()
     serializer_class = serializers.MovieSerializer
     filter_backends = (DjangoFilterBackend,)
-    #filter_fields = ('data_Year',)
     
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
